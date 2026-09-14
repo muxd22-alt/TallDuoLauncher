@@ -25,3 +25,16 @@ jobs:
       - name: Build, test, and lint
         working-directory: ${{ runner.temp }}/DuoLauncher-public
         run: ./gradlew --no-daemon :app:assembleDebug :app:testDebugUnitTest :app:lintDebug :app:assembleRelease
+
+      - name: Upload Debug APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TallDuoLauncher-Debug-APK
+          path: ${{ runner.temp }}/DuoLauncher-public/app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Upload Release APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TallDuoLauncher-Release-APK
+          path: ${{ runner.temp }}/DuoLauncher-public/app/build/outputs/apk/release/app-release-unsigned.apk
+
