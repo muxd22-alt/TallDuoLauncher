@@ -8,9 +8,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.PushPin
@@ -22,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -44,6 +45,7 @@ internal fun AppLibrary(
     drag: HomeDragState? = null, page: Int? = null,
     onLaunchFrom: (AppEntry, android.graphics.Rect?) -> Unit = { app, _ -> onLaunch(app) },
     onTurnOnWork: (Long) -> Unit = {},
+    isVisible: Boolean = true,
 ) {
     val glass = !editing
     val palette = LocalDuoPalette.current
@@ -53,10 +55,10 @@ internal fun AppLibrary(
     }
     val hasWork = state.profiles.any { it.isWork } || state.apps.any { it.isWork }
     var showWork by remember { mutableStateOf(false) }
-    val listState = rememberLazyListState()
+    val gridState = rememberLazyGridState()
     val selectedProfile = if (showWork) state.profiles.firstOrNull { it.isWork } else state.profiles.firstOrNull { it.isPersonal }
     LaunchedEffect(showWork, selectedProfile?.available, selectedProfile?.quiet) {
-        listState.scrollToItem(0)
+        gridState.scrollToItem(0)
     }
     val visibleApps = remember(state.apps, query, showWork, hasWork) {
         state.apps.filter { (!hasWork || it.isWork == showWork) && it.label.contains(query.trim(), true) }
@@ -66,6 +68,19 @@ internal fun AppLibrary(
             it.label.firstOrNull()?.takeIf(Char::isLetter)?.uppercaseChar()?.toString() ?: "#"
         }
     }
+    val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(isVisible) {
+        if (isVisible) {
+            delay(120)
+            try {
+                focusRequester.requestFocus()
+                keyboardController?.show()
+            } catch (_: Exception) {}
+        }
+    }
+
     Surface(modifier, shape = RoundedCornerShape(24.dp),
         color = if (glass) Glass.copy(alpha = .48f) else MaterialTheme.colorScheme.surface,
         contentColor = ink,
@@ -81,14 +96,27 @@ internal fun AppLibrary(
                 FilterChip(selected = !showWork, onClick = { showWork = false }, label = { Text("Personal") })
                 FilterChip(selected = showWork, onClick = { showWork = true }, label = { Text("Work") })
             }
-            val focusRequester = remember { FocusRequester() }
-            val keyboardController = LocalSoftwareKeyboardController.current
-            OutlinedTextField(query, onQuery, Modifier.fillMaxWidth().padding(vertical = 12.dp)
-                .focusRequester(focusRequester)
-                .testTag(if (editing) "pin-search" else "library-search"),
-                placeholder = { Text("Search apps") }, singleLine = true, shape = RoundedCornerShape(16.dp),
+            OutlinedTextField(
+                value = query,
+                onValueChange = onQuery,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 12.dp)
+                    .focusRequester(focusRequester)
+                    .clickable {
+                        focusRequester.requestFocus()
+                        keyboardController?.show()
+                    }
+                    .testTag(if (editing) "pin-search" else "library-search"),
+                placeholder = { Text("Search apps") },
+                singleLine = true,
+                shape = RoundedCornerShape(16.dp),
                 leadingIcon = { Icon(Icons.Rounded.Search, null) },
-                trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { onQuery("") }) { Icon(Icons.Rounded.Close, "Clear search") } },
+                trailingIcon = {
+                    if (query.isNotEmpty()) IconButton(onClick = { onQuery("") }) {
+                        Icon(Icons.Rounded.Close, "Clear search")
+                    }
+                },
                 colors = if (glass) OutlinedTextFieldDefaults.colors(
                     focusedTextColor = ink, unfocusedTextColor = ink, cursorColor = ink,
                     focusedContainerColor = Color.White.copy(alpha = .18f), unfocusedContainerColor = Color.White.copy(alpha = .12f),
@@ -96,30 +124,33 @@ internal fun AppLibrary(
                     focusedPlaceholderColor = ink, unfocusedPlaceholderColor = ink,
                     focusedLeadingIconColor = ink, unfocusedLeadingIconColor = ink,
                     focusedTrailingIconColor = ink, unfocusedTrailingIconColor = ink,
-                ) else OutlinedTextFieldDefaults.colors())
-            LaunchedEffect(Unit) {
-                delay(300)
-                focusRequester.requestFocus()
-                keyboardController?.show()
-            }
-            LazyColumn(Modifier.weight(1f).testTag("all-apps-list"), state = listState,
-                contentPadding = PaddingValues(bottom = 12.dp)) {
-                if (showWork && selectedProfile?.available == false) item("work-paused") {
+                ) else OutlinedTextFieldDefaults.colors()
+            )
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier.weight(1f).testTag("all-apps-list"),
+                state = gridState,
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                contentPadding = PaddingValues(bottom = 16.dp)
+            ) {
+                if (showWork && selectedProfile?.available == false) item(span = { GridItemSpan(2) }, key = "work-paused") {
                     Column(Modifier.fillMaxWidth().padding(vertical = 20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(if (selectedProfile.quiet) "Work apps are paused" else "Work profile is unavailable")
                         if (selectedProfile.quiet) Button(onClick = { onTurnOnWork(selectedProfile.userSerial) },
                             Modifier.padding(top = 10.dp).testTag("turn-on-work")) { Text("Turn on work apps") }
                     }
                 }
-                if (groups.isEmpty()) item { Text(if (state.loading) "Loading apps…" else "No apps found", Modifier.padding(vertical = 20.dp)) }
+                if (groups.isEmpty()) item(span = { GridItemSpan(2) }) {
+                    Text(if (state.loading) "Loading apps…" else "No apps found", Modifier.padding(vertical = 20.dp))
+                }
                 groups.forEach { (letter, entries) ->
-                    stickyHeader(key = "heading-$letter") {
-                        Row(Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                            // An opaque small chip prevents text from showing through the sticky letter.
-                            Box(Modifier.size(width = 32.dp, height = 28.dp).background(
+                    item(span = { GridItemSpan(2) }, key = "heading-$letter") {
+                        Row(Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Box(Modifier.size(width = 32.dp, height = 26.dp).background(
                                 if (glass) (if (palette.dark) Color(0xFF314852) else Color(0xFFB7CBD3))
                                 else MaterialTheme.colorScheme.surfaceContainer,
-                                RoundedCornerShape(10.dp)), contentAlignment = Alignment.Center) {
+                                RoundedCornerShape(8.dp)), contentAlignment = Alignment.Center) {
                                 Text(letter, color = ink, fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
                             }
                             if (glass) HorizontalDivider(Modifier.weight(1f).padding(start = 10.dp), color = Color.White.copy(alpha = .24f))
@@ -130,18 +161,32 @@ internal fun AppLibrary(
                         val launchBounds = remember { android.graphics.Rect() }
                         val dragModifier = if (drag != null) Modifier.dropRegion(drag, DropTarget.Library(app.id), app.id, page) else Modifier
                         val click = { if (editing) onPin(app.id, !isPinned) else onLaunchFrom(app, launchBounds) }
-                        Row(Modifier.fillMaxWidth().heightIn(min = 60.dp).then(dragModifier).clip(RoundedCornerShape(14.dp)).testTag("library-app-${app.id}")
-                            .then(if (drag == null) Modifier.combinedClickable(onClick = click, onLongClick = { onActions(app) })
-                                else Modifier.clickable(onClick = click).semantics { onLongClick("App options") { onActions(app); true } })
-                            .padding(vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Image(app.imageBitmap, null, Modifier.size(40.dp)
-                                .onGloballyPositioned { launchBounds.set(it.boundsInWindow().toAndroidBounds()) }.clip(RoundedCornerShape(10.dp)))
-                            Text(app.label, Modifier.weight(1f).padding(start = 12.dp), maxLines = 2, fontSize = 14.sp)
-                            if (editing) IconButton(onClick = { onPin(app.id, !isPinned) }, Modifier.testTag("pin-${app.id}")) {
-                                Icon(if (isPinned) Icons.Rounded.PushPin else Icons.Outlined.PushPin,
-                                    if (isPinned) "Remove ${app.label} from home" else "Pin ${app.label} to home",
-                                    tint = if (isPinned) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-                                    modifier = Modifier.size(20.dp))
+                        Surface(
+                            shape = RoundedCornerShape(16.dp),
+                            color = Color.White.copy(alpha = if (glass) .12f else .06f),
+                            border = BorderStroke(1.dp, Color.White.copy(alpha = .2f)),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = 54.dp)
+                                .then(dragModifier)
+                                .clip(RoundedCornerShape(16.dp))
+                                .testTag("library-app-${app.id}")
+                                .then(if (drag == null) Modifier.combinedClickable(onClick = click, onLongClick = { onActions(app) })
+                                    else Modifier.clickable(onClick = click).semantics { onLongClick("App options") { onActions(app); true } })
+                        ) {
+                            Row(
+                                Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Image(app.imageBitmap, null, Modifier.size(38.dp)
+                                    .onGloballyPositioned { launchBounds.set(it.boundsInWindow().toAndroidBounds()) }.clip(RoundedCornerShape(10.dp)))
+                                Text(app.label, Modifier.weight(1f).padding(start = 8.dp), maxLines = 1, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = ink)
+                                if (editing) IconButton(onClick = { onPin(app.id, !isPinned) }, Modifier.size(24.dp).testTag("pin-${app.id}")) {
+                                    Icon(if (isPinned) Icons.Rounded.PushPin else Icons.Outlined.PushPin,
+                                        if (isPinned) "Remove ${app.label} from home" else "Pin ${app.label} to home",
+                                        tint = if (isPinned) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                                        modifier = Modifier.size(18.dp))
+                                }
                             }
                         }
                     }

@@ -442,7 +442,9 @@ fun LauncherScreen(
             val wide = maxWidth.value >= 650f
             val preset = if (wide) state.expanded else state.compact
             val density = LocalDensity.current
-            val inLibrary = pager.currentPage == visibleHomePages
+            val currentLogicalPage = pager.currentPage - firstHome
+            val inLibrary = currentLogicalPage == visibleHomePages
+            val isHomePage = currentLogicalPage in 0 until visibleHomePages
             var statusHeight by remember { mutableFloatStateOf(0f) }
             val geometry = homeGeometry(maxWidth.value, maxHeight.value, preset, state.labels,
                 statusHeight = if (state.verticalStatus) statusHeight + 22f else 0f,
@@ -480,7 +482,7 @@ fun LauncherScreen(
             }
             val contentHeight = maxHeight
             val panelWidth = maxWidth - geometry.homeWidth.dp
-            val pagerWidth = maxWidth - preset.dockWidth.dp - 28.dp
+            val pagerWidth = maxWidth
             val leftColumnOrigin = (maxWidth / 2f - geometry.gridWidth.dp) / 2f - 16.dp
             val homeStride = panelWidth - leftColumnOrigin
             val bottomSpace = if (isDefaultHome) 44.dp else 88.dp
@@ -580,9 +582,10 @@ fun LauncherScreen(
                     } else if (page == visibleHomePages) {
                         AppLibrary(state, libraryQuery, { libraryQuery = it }, onLaunch, model::setPinned,
                             onActions = { selectedId = it.id }, modifier = Modifier.fillMaxSize().padding(start = 16.dp, top = 16.dp, bottom = bottomSpace).testTag("library-page"),
-                            drag = drag, page = visibleHomePages, onLaunchFrom = onLaunchFrom, onTurnOnWork = { model.turnOnWork(it) })
+                            drag = drag, page = visibleHomePages, onLaunchFrom = onLaunchFrom, onTurnOnWork = { model.turnOnWork(it) },
+                            isVisible = inLibrary)
                     } else {
-                        Row(Modifier.fillMaxSize().testTag("home-surface")
+                        Row(Modifier.fillMaxSize().padding(end = (preset.dockWidth + 12).dp).testTag("home-surface")
                             .then(if (onDoubleTapLock != null) {
                                 Modifier.pointerInput(drag.active, onDoubleTapLock) {
                                     detectTapGestures(
@@ -604,7 +607,7 @@ fun LauncherScreen(
                     }
                 }
             }
-            val showSidebar = pager.currentPage >= firstHome
+            val showSidebar = isHomePage
             if (showSidebar) {
                 if (state.verticalStatus) StatusRail(deviceStatus,
                     Modifier.align(Alignment.TopEnd).padding(end = 12.dp).offset(y = geometry.contentTop.dp)
