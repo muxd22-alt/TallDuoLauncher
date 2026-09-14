@@ -52,10 +52,11 @@ fun homeGeometry(width: Float, height: Float, preset: LayoutPreset, labels: Bool
     val baseRow = maxOf(48f, icon + labelExtra) + p.rowGap
     val widget = minOf(176f, gridWidth / 2f - 5f).coerceAtLeast(88f)
     val topLimit = maxOf(8f, statusHeight)
+    val isTallScreen = height >= 780f
     val availableGridHeight = (height - topLimit - homeBottomSpace - 32f).coerceAtLeast(200f)
-    val calcRow = (availableGridHeight - widget - 18f) / 4f
+    val calcRow = if (isTallScreen) (availableGridHeight - widget - 18f) / 4f else baseRow
     val row = maxOf(baseRow, calcRow).coerceIn(baseRow, 115f)
-    val contentTop = ((height - widget - 18f - 4f * row - homeBottomSpace) / 2f).coerceIn(maxOf(16f, topLimit + 4f), 120f)
+    val contentTop = ((height - widget - 18f - 4f * row - homeBottomSpace) / 2f).coerceIn(16f, maxOf(72f, topLimit + 4f))
     val bottomReserve = if (inLibrary) 12f else 124f
     // Outer dock edges span the first through third icon images, excluding the last label.
     val desiredHeight = if (p.dockAlignToGrid) 2f * row + icon else 256f
