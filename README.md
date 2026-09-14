@@ -4,9 +4,15 @@ A specialized Android launcher built around a right-side dock, optimized tall sc
 
 > [!NOTE]  
 > **Tall Screen Optimization & Upstream Sync**  
-> `TallDuoLauncher` is a tailored edition for modern tall phone aspect ratios. It remains in sync with [Lalitmukesh69/DuoLauncher](https://github.com/Lalitmukesh69/DuoLauncher) (retaining features like dock recents and double-tap to lock) while advancing specialized support for tall single displays:
+> `TallDuoLauncher` is a tailored edition for modern tall phone aspect ratios. It remains in sync with upstream improvements while advancing specialized support for tall single displays:
 > - **Organic Tall Phone Geometry**: Dynamic row scaling and vertical centering so icons and widgets distribute gracefully across 19.5:9, 20:9, and 21:9 screen ratios instead of clumping at the top.
 > - **Google Discover Feed Polish**: Seamless, zero-glitch transparent activity embedding without dark overlay boxes or transition write-over lag.
+
+## Credits & Acknowledgments
+
+Heartfelt thanks and credit to the original creators whose open-source foundations make this project possible:
+- **[jakesgoodapps](https://github.com/jakesgoodapps/DuoLauncher)** for designing the original native Duo Launcher architecture and right-side dock layout concept.
+- **[Lalitmukesh69](https://github.com/Lalitmukesh69/DuoLauncher)** for building key launcher features including dock recents support, double-tap to lock screen gestures, and active launcher enhancements.
 
 **Experimental Tall & Fold Beta · Android 12 or later.** Tested on modern tall single screens and foldables. Google Discover depends on the installed Google app and device support for activity embedding. See the [tested environments and remaining checks](docs/public-release.md#beta-0150-beta01-validation).
 
