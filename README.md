@@ -1,8 +1,14 @@
-# Duo Launcher
+# TallDuoLauncher (Beta of the Beta)
 
-A native Android launcher built around a right-side dock and a home screen that makes room when you unfold your phone.
+A specialized Android launcher built around a right-side dock, optimized tall screen geometry, and smooth Google Discover feed integration.
 
-**Experimental Fold beta · Android 12 or later.** The primary physical test device is a Galaxy Fold8 running Android 17. Emulator coverage supplements that device; it does not establish compatibility with every foldable. Google Discover depends on the installed Google app and device support for activity embedding. See the [tested environments and remaining checks](docs/public-release.md#beta-0150-beta01-validation).
+> [!NOTE]  
+> **Tall Screen Optimization & Upstream Sync**  
+> `TallDuoLauncher` is a tailored edition for modern tall phone aspect ratios. It remains in sync with [Lalitmukesh69/DuoLauncher](https://github.com/Lalitmukesh69/DuoLauncher) (retaining features like dock recents and double-tap to lock) while advancing specialized support for tall single displays:
+> - **Organic Tall Phone Geometry**: Dynamic row scaling and vertical centering so icons and widgets distribute gracefully across 19.5:9, 20:9, and 21:9 screen ratios instead of clumping at the top.
+> - **Google Discover Feed Polish**: Seamless, zero-glitch transparent activity embedding without dark overlay boxes or transition write-over lag.
+
+**Experimental Tall & Fold Beta · Android 12 or later.** Tested on modern tall single screens and foldables. Google Discover depends on the installed Google app and device support for activity embedding. See the [tested environments and remaining checks](docs/public-release.md#beta-0150-beta01-validation).
 
 <p>
   <img src="docs/images/duo-launcher-cover-home.png" width="240" alt="Duo Home on a cover-sized emulator, with its right-side dock">
