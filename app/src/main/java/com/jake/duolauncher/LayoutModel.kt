@@ -48,13 +48,14 @@ fun homeGeometry(width: Float, height: Float, preset: LayoutPreset, labels: Bool
     val homeWidth = if (expanded) minOf(460f, width * 0.56f) else width
     val gridWidth = (homeWidth - p.dockWidth - 44f).coerceAtLeast(192f)
     val icon = minOf(p.iconSize, (gridWidth / 4f - 10f).coerceAtLeast(32f))
-    // Keep the same icon rhythm when labels are hidden; allow larger system text to fit.
-    val row = maxOf(48f, icon + if (labels) maxOf(20f, labelHeight) else 20f) + p.rowGap
+    val labelExtra = if (labels) maxOf(20f, labelHeight) else 20f
+    val baseRow = maxOf(48f, icon + labelExtra) + p.rowGap
     val widget = minOf(176f, gridWidth / 2f - 5f).coerceAtLeast(88f)
-    val contentTop = ((height - widget - 18f - 4f * row - homeBottomSpace) / 2f).coerceIn(16f, 72f)
-    // Search reclaims the redundant bottom controls' space for all four dock apps.
-    // Extremely short windows still scroll rather than reduce touch targets below 48dp.
     val topLimit = maxOf(8f, statusHeight)
+    val availableGridHeight = (height - topLimit - homeBottomSpace - 32f).coerceAtLeast(200f)
+    val calcRow = (availableGridHeight - widget - 18f) / 4f
+    val row = maxOf(baseRow, calcRow).coerceIn(baseRow, 115f)
+    val contentTop = ((height - widget - 18f - 4f * row - homeBottomSpace) / 2f).coerceIn(maxOf(16f, topLimit + 4f), 120f)
     val bottomReserve = if (inLibrary) 12f else 124f
     // Outer dock edges span the first through third icon images, excluding the last label.
     val desiredHeight = if (p.dockAlignToGrid) 2f * row + icon else 256f

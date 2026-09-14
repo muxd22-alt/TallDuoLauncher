@@ -262,8 +262,9 @@ class DiscoverFeedActivity : DiscoverPageActivity() {
                     if (!DiscoverBounds.available) DuneWallpaper(showDunesFallback = false)
                     Surface(if (DiscoverBounds.available) Modifier.fillMaxSize()
                         else Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing).padding(12.dp),
-                        shape = RoundedCornerShape(if (DiscoverBounds.available) 16.dp else 26.dp),
-                        color = Glass, border = BorderStroke(1.dp, Color.White.copy(alpha = .4f))) {
+                        shape = RoundedCornerShape(if (DiscoverBounds.available) 0.dp else 26.dp),
+                        color = if (DiscoverBounds.available) Color.Transparent else Glass,
+                        border = if (DiscoverBounds.available) null else BorderStroke(1.dp, Color.White.copy(alpha = .4f))) {
                         // Recovery is only shown while connecting or after a real error. A native
                         // swipe must never reveal the old loading controls behind a loaded feed.
                         if (showMessage) Column(Modifier.fillMaxSize().graphicsLayer {

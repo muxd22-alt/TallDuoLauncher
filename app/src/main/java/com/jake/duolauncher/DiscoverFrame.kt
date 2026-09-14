@@ -124,11 +124,9 @@ internal class DiscoverFrame(private val activity: Activity, private val vertica
                     if (fullSize == Size.Zero) Size(width.toFloat(), height.toFloat()) else fullSize) {
                         drawLauncherBackground(LauncherBackgroundCache.bitmap?.asImageBitmap(), DuoAppearanceRuntime.dark)
                     }
-                if (DiscoverBounds.available) canvas.drawColor(
-                    if (DuoAppearanceRuntime.dark) 0xeb263a43.toInt() else 0xebe8eff2.toInt())
                 canvas.restoreToCount(saved)
                 canvas.drawPath(path, border)
-                if (coverAlpha > 0f) {
+                if (coverAlpha > 0f && !DiscoverBounds.available) {
                     cover.color = if (DuoAppearanceRuntime.dark) 0xff263a43.toInt() else 0xffe8eff2.toInt()
                     cover.alpha = (coverAlpha * 255).toInt()
                     canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), cover)
