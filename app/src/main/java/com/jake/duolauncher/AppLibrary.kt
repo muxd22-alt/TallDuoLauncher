@@ -32,6 +32,8 @@ import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.boundsInWindow
 import kotlinx.coroutines.delay
 
 @Composable
