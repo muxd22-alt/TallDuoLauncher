@@ -17,15 +17,16 @@ class DockRecentsTest {
     }
 
     @Test
-    fun `visible recents takes at most four apps`() {
+    fun `visible recents fills remaining slots up to total of four`() {
         val dock = listOf("pinned1", "pinned2", null, null)
         val recentApps = listOf("app1", "app2", "app3", "app4", "app5", "app6")
         val availableApps = recentApps.toSet()
 
-        val visibleRecents = recentApps.filter { it !in dock && it in availableApps }.take(4)
+        val recentsLimit = maxOf(0, 4 - dock.count { it != null })
+        val visibleRecents = recentApps.filter { it !in dock && it in availableApps }.take(recentsLimit)
 
-        assertEquals(listOf("app1", "app2", "app3", "app4"), visibleRecents)
-        assertEquals(4, visibleRecents.size)
+        assertEquals(listOf("app1", "app2"), visibleRecents)
+        assertEquals(2, visibleRecents.size)
     }
 
     @Test

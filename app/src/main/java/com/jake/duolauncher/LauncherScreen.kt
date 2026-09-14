@@ -604,31 +604,34 @@ fun LauncherScreen(
                     }
                 }
             }
-            if (state.verticalStatus) StatusRail(deviceStatus,
-                Modifier.align(Alignment.TopEnd).padding(end = 12.dp).offset(y = geometry.contentTop.dp)
-                    .width(preset.dockWidth.dp).onSizeChanged {
-                        // The normal rail's 20dp location slot and 3dp gap do not move the dock.
-                        statusHeight = (with(density) { it.height.toDp().value } -
-                            if (contentHeight < 500.dp) 0f else 23f).coerceAtLeast(0f)
-                    },
-                compact = contentHeight < 500.dp, iconSize = dockIconSize(geometry.iconSize).dp)
-            val visibleRecents = remember(state.recentApps, state.dock, appsById, state.showRecentApps) {
-                if (!state.showRecentApps) emptyList()
-                else state.recentApps.filter { it !in state.dock && appsById.containsKey(it) }.take(4)
-            }
-            val bottomReserveDp = if (inLibrary) 12.dp else 124.dp
-            val maxDockHeight = (contentHeight - geometry.dockTop.dp - bottomReserveDp).coerceAtLeast(geometry.dockHeight.dp)
-            val desiredDockHeight = geometry.dockHeight.dp + if (visibleRecents.isNotEmpty()) {
-                14.dp + (geometry.dockRowHeight * visibleRecents.size).dp
-            } else 0.dp
-            val dockHeight = minOf(desiredDockHeight, maxDockHeight)
-            Surface(Modifier.align(Alignment.TopEnd).padding(end = 12.dp).offset(y = geometry.dockTop.dp)
-                .width(preset.dockWidth.dp).height(dockHeight).graphicsLayer {
-                    // Composite the stationary dock independently of the shared pager layer.
-                    compositingStrategy = androidx.compose.ui.graphics.CompositingStrategy.Offscreen
-                }.testTag("dock"),
-                shape = RoundedCornerShape(30.dp), color = Glass.copy(alpha = .32f),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = .3f))) {
+            val showSidebar = pager.currentPage >= firstHome
+            if (showSidebar) {
+                if (state.verticalStatus) StatusRail(deviceStatus,
+                    Modifier.align(Alignment.TopEnd).padding(end = 12.dp).offset(y = geometry.contentTop.dp)
+                        .width(preset.dockWidth.dp).onSizeChanged {
+                            // The normal rail's 20dp location slot and 3dp gap do not move the dock.
+                            statusHeight = (with(density) { it.height.toDp().value } -
+                                if (contentHeight < 500.dp) 0f else 23f).coerceAtLeast(0f)
+                        },
+                    compact = contentHeight < 500.dp, iconSize = dockIconSize(geometry.iconSize).dp)
+                val recentsLimit = maxOf(0, 4 - state.dock.count { it != null })
+                val visibleRecents = remember(state.recentApps, state.dock, appsById, state.showRecentApps, recentsLimit) {
+                    if (!state.showRecentApps || recentsLimit == 0) emptyList()
+                    else state.recentApps.filter { it !in state.dock && appsById.containsKey(it) }.take(recentsLimit)
+                }
+                val bottomReserveDp = if (inLibrary) 12.dp else 124.dp
+                val maxDockHeight = (contentHeight - geometry.dockTop.dp - bottomReserveDp).coerceAtLeast(geometry.dockHeight.dp)
+                val desiredDockHeight = geometry.dockHeight.dp + if (visibleRecents.isNotEmpty()) {
+                    14.dp + (geometry.dockRowHeight * visibleRecents.size).dp
+                } else 0.dp
+                val dockHeight = minOf(desiredDockHeight, maxDockHeight)
+                Surface(Modifier.align(Alignment.TopEnd).padding(end = 12.dp).offset(y = geometry.dockTop.dp)
+                    .width(preset.dockWidth.dp).height(dockHeight).graphicsLayer {
+                        // Composite the stationary dock independently of the shared pager layer.
+                        compositingStrategy = androidx.compose.ui.graphics.CompositingStrategy.Offscreen
+                    }.testTag("dock"),
+                    shape = RoundedCornerShape(30.dp), color = Glass.copy(alpha = .32f),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = .3f))) {
                 Column(Modifier.padding(vertical = 8.dp).verticalScroll(dockScroll), horizontalAlignment = Alignment.CenterHorizontally) {
                     DockAppColumn(state.dock, previewLayout.dock, appsById, geometry.dockRowHeight,
                         dockIconSize(geometry.iconSize), drag, insertionTarget,
@@ -693,6 +696,7 @@ fun LauncherScreen(
                             }
                         }
                     }
+                }
                 }
             }
             Column(Modifier.align(Alignment.BottomStart).width(pagerWidth).padding(start = 16.dp, bottom = 6.dp), horizontalAlignment = Alignment.CenterHorizontally) {

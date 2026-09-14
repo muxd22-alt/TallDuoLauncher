@@ -29,8 +29,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.onLongClick
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import kotlinx.coroutines.delay
 
 @Composable
 internal fun AppLibrary(
@@ -77,7 +79,11 @@ internal fun AppLibrary(
                 FilterChip(selected = !showWork, onClick = { showWork = false }, label = { Text("Personal") })
                 FilterChip(selected = showWork, onClick = { showWork = true }, label = { Text("Work") })
             }
-            OutlinedTextField(query, onQuery, Modifier.fillMaxWidth().padding(vertical = 12.dp).testTag(if (editing) "pin-search" else "library-search"),
+            val focusRequester = remember { FocusRequester() }
+            val keyboardController = LocalSoftwareKeyboardController.current
+            OutlinedTextField(query, onQuery, Modifier.fillMaxWidth().padding(vertical = 12.dp)
+                .focusRequester(focusRequester)
+                .testTag(if (editing) "pin-search" else "library-search"),
                 placeholder = { Text("Search apps") }, singleLine = true, shape = RoundedCornerShape(16.dp),
                 leadingIcon = { Icon(Icons.Rounded.Search, null) },
                 trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { onQuery("") }) { Icon(Icons.Rounded.Close, "Clear search") } },
@@ -89,6 +95,11 @@ internal fun AppLibrary(
                     focusedLeadingIconColor = ink, unfocusedLeadingIconColor = ink,
                     focusedTrailingIconColor = ink, unfocusedTrailingIconColor = ink,
                 ) else OutlinedTextFieldDefaults.colors())
+            LaunchedEffect(Unit) {
+                delay(300)
+                focusRequester.requestFocus()
+                keyboardController?.show()
+            }
             LazyColumn(Modifier.weight(1f).testTag("all-apps-list"), state = listState,
                 contentPadding = PaddingValues(bottom = 12.dp)) {
                 if (showWork && selectedProfile?.available == false) item("work-paused") {
