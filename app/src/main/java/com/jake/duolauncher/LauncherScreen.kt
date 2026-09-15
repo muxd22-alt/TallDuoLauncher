@@ -442,9 +442,8 @@ fun LauncherScreen(
             val wide = maxWidth.value >= 650f
             val preset = if (wide) state.expanded else state.compact
             val density = LocalDensity.current
-            val currentLogicalPage = pager.currentPage - firstHome
-            val inLibrary = currentLogicalPage == visibleHomePages
-            val isHomePage = currentLogicalPage in 0 until visibleHomePages
+            val inLibrary = pager.currentPage == visibleHomePages
+            val isHomePage = pager.currentPage in 0 until visibleHomePages
             var statusHeight by remember { mutableFloatStateOf(0f) }
             val geometry = homeGeometry(maxWidth.value, maxHeight.value, preset, state.labels,
                 statusHeight = if (state.verticalStatus) statusHeight + 22f else 0f,
@@ -536,10 +535,9 @@ fun LauncherScreen(
                     if (firstHome > 0) {
                         val bounds = it.boundsInWindow()
                         LiveDiscover.pagerOrigin = bounds.topLeft
-                        val padding = 32 * density.density
                         LiveDiscover.prepare(launcherActivity,
-                            android.graphics.Rect((bounds.left + padding).toInt(), (bounds.top + padding).toInt(),
-                                (bounds.right - 16 * density.density).toInt(), (bounds.bottom - padding).toInt()), bounds.width)
+                            android.graphics.Rect(bounds.left.toInt(), bounds.top.toInt(),
+                                bounds.right.toInt(), bounds.bottom.toInt()), bounds.width)
                     }
                 }
                 .semantics { stateDescription = if (pager.currentPage == -1) "Discover" else if (pager.currentPage == visibleHomePages) "All apps" else "Home page ${pager.currentPage + 1} of $visibleHomePages" }
@@ -578,12 +576,12 @@ fun LauncherScreen(
                     key = { if (it < firstHome) "discover" else if (it - firstHome == visibleHomePages) "library" else "home-${it - firstHome}" }) { physicalPage ->
                     val page = physicalPage - firstHome
                     if (page == -1) {
-                        DiscoverContent(Modifier.fillMaxSize().padding(start = 16.dp, top = 16.dp, bottom = 16.dp))
+                        DiscoverContent(Modifier.fillMaxSize())
                     } else if (page == visibleHomePages) {
                         AppLibrary(state, libraryQuery, { libraryQuery = it }, onLaunch, model::setPinned,
                             onActions = { selectedId = it.id }, modifier = Modifier.fillMaxSize().padding(start = 16.dp, top = 16.dp, bottom = bottomSpace).testTag("library-page"),
                             drag = drag, page = visibleHomePages, onLaunchFrom = onLaunchFrom, onTurnOnWork = { model.turnOnWork(it) },
-                            isVisible = inLibrary)
+                            isVisible = pager.settledPage == visibleHomePages && !nativePager.isScrollInProgress)
                     } else {
                         Row(Modifier.fillMaxSize().padding(end = (preset.dockWidth + 12).dp).testTag("home-surface")
                             .then(if (onDoubleTapLock != null) {

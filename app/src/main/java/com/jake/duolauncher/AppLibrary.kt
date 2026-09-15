@@ -73,7 +73,7 @@ internal fun AppLibrary(
 
     LaunchedEffect(isVisible) {
         if (isVisible) {
-            delay(120)
+            delay(100)
             try {
                 focusRequester.requestFocus()
                 keyboardController?.show()
@@ -103,10 +103,6 @@ internal fun AppLibrary(
                     .fillMaxWidth()
                     .padding(vertical = 12.dp)
                     .focusRequester(focusRequester)
-                    .clickable {
-                        focusRequester.requestFocus()
-                        keyboardController?.show()
-                    }
                     .testTag(if (editing) "pin-search" else "library-search"),
                 placeholder = { Text("Search apps") },
                 singleLine = true,
