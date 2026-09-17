@@ -53,7 +53,7 @@ val releaseStoreFile = releaseSigningValues["DUO_RELEASE_STORE_FILE"]?.let { con
 }
 
 android {
-    namespace = upstreamApplicationId
+    namespace = "com.jake.duolauncher"
     compileSdk = 36
     defaultConfig {
         applicationId = effectiveApplicationId
