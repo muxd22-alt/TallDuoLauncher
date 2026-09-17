@@ -1,6 +1,6 @@
 package com.google.android.libraries.launcherclient;
 
-import com.google.android.libraries.launcherclient.ILauncherOverlayCallback;
+
 import android.os.Bundle;
 
 interface ILauncherOverlay {
