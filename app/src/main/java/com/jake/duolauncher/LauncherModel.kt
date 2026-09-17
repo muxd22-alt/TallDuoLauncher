@@ -47,7 +47,7 @@ data class LauncherState(
     val leadingSlots: List<String?> = List(HOME_CELLS) { null },
     val editRevision: Int = 0,
     val canUndoEdit: Boolean = false,
-    val dock: List<String?> = List(4) { null },
+    val dock: List<String?> = List(6) { null },
     val recentApps: List<String> = emptyList(),
     val showRecentApps: Boolean = true,
     val widgetPlacements: List<WidgetPlacement> = DEFAULT_WIDGET_PLACEMENTS,
@@ -556,7 +556,7 @@ class LauncherModel(application: Application) : AndroidViewModel(application) {
             require(leading.length() == HOME_CELLS)
             List(HOME_CELLS) { leading.optString(it).takeIf { id -> id.isNotBlank() && id != "null" } }
         } else List(HOME_CELLS) { null }
-        val loadedDock = List(4) { j.optJSONArray("dock")?.optString(it)?.takeIf { it.isNotBlank() && it != "null" } }
+        val loadedDock = List(6) { j.optJSONArray("dock")?.optString(it)?.takeIf { it.isNotBlank() && it != "null" } }
         val widgetArray = j.optJSONArray("widgets")
         val placements = if (schema >= 6) {
             require(widgetArray != null) { "Schema $schema requires a widget placement array" }

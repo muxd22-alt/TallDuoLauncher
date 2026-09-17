@@ -102,7 +102,7 @@ internal fun AppLibrary(
         border = if (glass) BorderStroke(1.dp, Color.White.copy(alpha = .38f)) else null) {
         Column(Modifier.background(Brush.verticalGradient(if (glass)
             listOf(Color.White.copy(alpha = .09f), Color.Transparent) else listOf(Color.Transparent, Color.Transparent)))
-            .padding(horizontal = 16.dp).padding(top = 18.dp)) {
+            .padding(horizontal = 24.dp).padding(top = 24.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(if (editing) "Choose home apps" else "All apps", Modifier.weight(1f), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Medium)
                 Text(if (editing) "${pinned.size} pinned" else "${visibleApps.size}", color = ink, fontSize = 12.sp)

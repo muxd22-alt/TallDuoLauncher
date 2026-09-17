@@ -252,7 +252,7 @@ private fun HelpSection(icon: ImageVector, title: String, detail: String) {
     val bitmap = stagedBitmap ?: committedBitmap
     val apps = remember(state.apps) { state.apps.associateBy { it.id } }
     val homeIcons = state.homeSlots.mapNotNull { id -> id?.let(apps::get) }.take(8)
-    val dockIcons = state.dock.mapNotNull { id -> id?.let(apps::get) }.take(5)
+    val dockIcons = state.dock.mapNotNull { id -> id?.let(apps::get) }.take(6)
     val scale = previewHeight.value * .632f / 250f
     fun unit(value: Float) = (value * scale).dp
     Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
