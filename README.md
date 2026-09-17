@@ -1,5 +1,17 @@
 # Duo Launcher
 
+*Forked from [jakesgoodapps/DuoLauncher](https://github.com/jakesgoodapps/DuoLauncher)*
+
+**Special Thanks:**
+Huge thanks to **jakesgoodapps**, the original creator of this launcher, for the incredible foundation, and to **lbouriez** for their work adding the Google At a Glance fallback and other structural contributions.
+
+**This Fork's Improvements:**
+- **Dynamic Foldable Grid Control:** Configurable 3-6 column density slider in settings for a clean fit on smaller folds.
+- **Flawless Fold Splitting:** Unfolded layout math now perfectly stops strictly at the screen midpoint (1:1), leaving no bleeding app icons across your folding crease.
+- **Edge Hinge Buffer:** `StatusRail` and Dock automatically offset inward when unfolded to avoid overlapping with outer physical case curves and bezel hinges.
+- **Pixel Bridge Feed:** Native Companion Feed picker to let you easily fall back to Lawnfeed or Pixel Bridge overlay providers!
+- **CI/CD Releases:** Automated GitHub Actions workflows for safe release signing and deployment.
+
 A native Android launcher built around a right-side dock and a home screen that makes room when you unfold your phone.
 
 **Experimental Fold beta · Android 12 or later.** The primary physical test device is a Galaxy Fold8 running Android 17. Emulator coverage supplements that device; it does not establish compatibility with every foldable. Google Discover depends on the installed Google app and device support for activity embedding. See the [tested environments and remaining checks](docs/public-release.md#beta-0150-beta01-validation).
