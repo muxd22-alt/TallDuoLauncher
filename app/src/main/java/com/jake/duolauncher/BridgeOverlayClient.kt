@@ -44,7 +44,7 @@ internal class BridgeOverlayClient(
     private var closeCompleted = false
     private var closeAnimator: ValueAnimator? = null
 
-    fun connect() {
+    override fun connect() {
         if (activity.isDestroyed || activity.isFinishing) return
         disconnect()
         val bridgeVersion = runCatching {
@@ -158,7 +158,19 @@ internal class BridgeOverlayClient(
         }
     }
 
-    override fun resume() { resumed = true; if (ready) { if (pagerDriven) { try { remote?.openOverlay(0) } catch(e:Exception){} applyPage() } else show() } else if (remote != null) try { remote?.openOverlay(0) } catch(e:Exception){}    }
+    override fun resume() {
+        resumed = true
+        if (ready) {
+            if (pagerDriven) {
+                try { remote?.openOverlay(0) } catch(e:Exception){}
+                applyPage()
+            } else {
+                show()
+            }
+        } else if (remote != null) {
+            try { remote?.openOverlay(0) } catch(e:Exception){}
+        }
+    }
     override fun page(progress: Float, scrolling: Boolean) {
         val request = ++pageRequest
         desiredProgress = progress.coerceIn(0f, 1f)
