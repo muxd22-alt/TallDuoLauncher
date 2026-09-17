@@ -41,7 +41,7 @@ internal class DiscoverClient(
     private var closeCompleted = false
     private var closeAnimator: ValueAnimator? = null
 
-    fun connect() {
+    override fun connect() {
         if (activity.isDestroyed || activity.isFinishing) return
         disconnect()
         val googleVersion = runCatching {
@@ -175,8 +175,8 @@ internal class DiscoverClient(
         }, 12_000)
     }
 
-    fun resume() { resumed = true; if (ready) { if (pagerDriven) { send(8); applyPage() } else show() } else if (remote != null) send(8) }
-    fun page(progress: Float, scrolling: Boolean) {
+    override fun resume() { resumed = true; if (ready) { if (pagerDriven) { send(8); applyPage() } else show() } else if (remote != null) send(8) }
+    override fun page(progress: Float, scrolling: Boolean) {
         val request = ++pageRequest
         desiredProgress = progress.coerceIn(0f, 1f)
         if (!ready || !resumed) return
@@ -203,7 +203,7 @@ internal class DiscoverClient(
         if (desiredProgress > 0f) { send(1); send(2) { writeFloat(desiredProgress) }; send(3) }
         else send(6) { writeInt(0) }
     }
-    fun pause() { resumed = false; openRequested = false; dismissal.suspend(); if (!closing && !pagerDriven) onProgress(1f); if (remote != null) send(7) }
+    override fun pause() { resumed = false; openRequested = false; dismissal.suspend(); if (!closing && !pagerDriven) onProgress(1f); if (remote != null) send(7) }
     private fun feedWidthDp() = activity.window.decorView.width / activity.resources.displayMetrics.density
     // The launcher has already entered Discover. Opening Google's window should not add a slide.
     private fun show() {
@@ -213,7 +213,7 @@ internal class DiscoverClient(
     }
 
     /** Keep the live feed moving until Home has been revealed underneath it. */
-    fun closeForHome(): Boolean {
+    override fun closeForHome(): Boolean {
         if (closing) return true
         if (remote == null || !everVisible) return false
         closing = true
@@ -274,7 +274,7 @@ internal class DiscoverClient(
         } finally { data.recycle() }
     }
 
-    fun disconnect() {
+    override fun disconnect() {
         generation++; pageRequest++; pageScrolling = false
         closeAnimator?.removeAllListeners(); closeAnimator?.cancel(); closeAnimator = null
         handler.removeCallbacksAndMessages(null)

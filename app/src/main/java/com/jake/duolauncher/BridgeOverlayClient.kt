@@ -165,7 +165,7 @@ internal class BridgeOverlayClient(
         if (!ready || !resumed) return
         try {
             if (scrolling && !pageScrolling) { pageScrolling = true; remote?.startScroll() }
-            remote?.overlayScrollChanged(desiredProgress)
+            remote?.overlayScroll(desiredProgress)
             if (!scrolling && pageScrolling) { pageScrolling = false; remote?.endScroll() } // note that AIDL does not have endScroll natively in my stub, I will just omit endScroll since it's unneeded or handled remotely if it doesn't exist. Actually, let me try to add endScroll to AIDL. Wait, code 3 is endScroll in DiscoverClient.kt!
             // Wait, DiscoverClient send(3) is endScroll(). Let's assume endScroll is in ILauncherOverlay, code 3. I didn't add it in my AIDL. I will just omit or send windowDetached.
             // Oh, I will just add endScroll to the AIDL later if needed, but let's call remote?.endScroll() assuming we add it. Or just don't call anything and let it settle.
@@ -181,7 +181,7 @@ internal class BridgeOverlayClient(
                 kotlin.math.abs(lastProgress - endpoint) < .001f) return@postDelayed
             try {
                 remote?.startScroll()
-                remote?.overlayScrollChanged(endpoint)
+                remote?.overlayScroll(endpoint)
                 remote?.endScroll()
                 if (endpoint == 0f) remote?.closeOverlay(0)
             } catch (e: Exception) {}
@@ -193,7 +193,7 @@ internal class BridgeOverlayClient(
         if (desiredProgress > 0f) {
             try {
                 remote?.startScroll()
-                remote?.overlayScrollChanged(desiredProgress)
+                remote?.overlayScroll(desiredProgress)
                 remote?.endScroll()
             } catch (e: Exception) {}
         } else try { remote?.closeOverlay(0) } catch (e: Exception) {}
@@ -223,7 +223,7 @@ internal class BridgeOverlayClient(
             addUpdateListener {
                 val position = it.animatedValue as Float
                 onProgress(position)
-                try { remote?.overlayScrollChanged(position) } catch(e:Exception){}
+                try { remote?.overlayScroll(position) } catch(e:Exception){}
             }
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {

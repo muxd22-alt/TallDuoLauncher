@@ -279,7 +279,7 @@ class LiveDiscoverActivity : ComponentActivity() {
             DiscoverClient(this, vertical, onState = onState, onVisible = onVisible,
                 onProgress = onProgress, onClosed = {}, pagerDriven = true)
         } else {
-            BridgeOverlayClient(this, companionFeed, vertical, onState = onState, onVisible = onVisible,
+            BridgeOverlayClient(this, vertical, companionFeed, onState = onState, onVisible = onVisible,
                 onProgress = onProgress, onClosed = {}, pagerDriven = true)
         }
         window.decorView.post { connect() }
