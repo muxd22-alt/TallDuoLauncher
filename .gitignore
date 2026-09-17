@@ -36,3 +36,7 @@ docs/images/*
 *.b64
 
 
+
+*.jks
+
+keystore_base64.txt
