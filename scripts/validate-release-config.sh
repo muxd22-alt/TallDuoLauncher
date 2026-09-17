@@ -15,7 +15,7 @@ if [[ $# -ne 0 ]]; then
     exit 2
 fi
 
-application_id=${DUO_APPLICATION_ID:-}
+application_id=${DUO_APPLICATION_ID:-com.tall.duolauncher}
 version_code=${DUO_VERSION_CODE:-}
 version_name=${DUO_VERSION_NAME:-}
 

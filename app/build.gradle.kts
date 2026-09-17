@@ -14,7 +14,7 @@ val releaseSigningValues = releaseSigningVariables.associateWith { name ->
     System.getenv(name)?.takeIf { it.isNotBlank() }
 }
 
-val upstreamApplicationId = "com.jake.duolauncher"
+val upstreamApplicationId = "com.tall.duolauncher"
 val applicationIdOverride = System.getenv("DUO_APPLICATION_ID")?.takeIf { it.isNotBlank() }
 val effectiveApplicationId = applicationIdOverride ?: upstreamApplicationId
 val applicationIdPattern = Regex("[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)+")
